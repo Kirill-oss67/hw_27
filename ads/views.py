@@ -1,6 +1,6 @@
-from django.http import HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import render
 
 
 def my_func(request):
-    return HttpResponse({"status": "ok"}, 200)
+    return JsonResponse({"status": "ok"})
