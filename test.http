@@ -1,0 +1,34 @@
+GET http://127.0.0.1:8000/cat/
+Accept: application/json
+###
+POST http://127.0.0.1:8000/cat/
+Accept: application/json
+Content-Type: application/json
+
+ {
+
+    "name": "Котямбы"
+  }
+###
+GET http://127.0.0.1:8000/ad/
+Accept: application/json
+###
+POST http://127.0.0.1:8000/ad/
+Accept: application/json
+Content-Type: application/json
+
+ {
+
+    "name": "Котярики в добрые руки",
+    "author": "Никита",
+    "price": 1002,
+    "description": "Сатоши Пеструшкин - спасённый из подвала малыш, которому последнему из братьев посчастливилось оказаться на передержке! Его братцы уже дома, а Сатоши только-только начинает свой путь. Ему около 2 месяцев, он уже прошел карантин и активно обучается хорошим манерам. Котёнок очень спокойный, немного робкий и стеснительный, но в любящих руках он нежно и ласково мурчит! Пишите нам в сообщения и приезжайте знакомиться.",
+    "address": "Пушкин, Павловское шоссе 23/2",
+    "is_published": true
+  }
+###
+GET http://127.0.0.1:8000/ad/1
+Accept: application/json
+###
+GET http://127.0.0.1:8000/cat/9/
+Accept: application/json
