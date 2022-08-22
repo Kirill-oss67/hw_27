@@ -12,3 +12,11 @@ class Ad(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
+
+
+class User(models.Model):
+    pass
+
+
+class Location(models.Model):
+    pass

@@ -27,8 +27,8 @@ Content-Type: application/json
     "is_published": true
   }
 ###
-GET http://127.0.0.1:8000/ad/1
+GET http://127.0.0.1:8000/ad/4
 Accept: application/json
 ###
-GET http://127.0.0.1:8000/cat/9/
+GET http://127.0.0.1:8000/cat/9
 Accept: application/json
