@@ -42,6 +42,6 @@ def convert_file(csv_file, model_name, json_file):
 
 
 convert_file(data_ads, "ads.ad", json_ads)
-convert_file(data_cat, "ads.category", json_cat)
-convert_file(data_user, "ads.user", json_user)
-convert_file(data_location, "ads.location", json_location)
+# convert_file(data_cat, "ads.category", json_cat)
+# convert_file(data_user, "ads.user", json_user)
+# convert_file(data_location, "ads.location", json_location)
