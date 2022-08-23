@@ -11,8 +11,8 @@ class Category(models.Model):
 
 class Location(models.Model):
     name = models.CharField(max_length=60)
-    lat = models.DecimalField(max_digits=8, decimal_places=6)
-    lng = models.DecimalField(max_digits=8, decimal_places=6)
+    lat = models.FloatField()
+    lng = models.FloatField()
 
     class Meta:
         verbose_name = "Место"
@@ -34,8 +34,8 @@ class User(models.Model):
     location_id = models.ManyToManyField(Location)
 
     class Meta:
-        verbose_name = "Локация"
-        verbose_name_plural = "Локации"
+        verbose_name = "Пользователь"
+        verbose_name_plural = "Пользователи"
         ordering = ['username']
 
 

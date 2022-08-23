@@ -4,7 +4,7 @@ from django.http import JsonResponse, request
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import DetailView
+from django.views.generic import DetailView, DeleteView
 
 from ads.models import Category, Ad
 
@@ -64,4 +64,24 @@ class CategoryDetailView(DetailView):
             return JsonResponse({"id": new_category.id, "name": new_category.name}, safe=False,
                                 json_dumps_params={"ensure_ascii": False})
         except Exception as error:
-            return JsonResponse({"error": error},status=404)
+            return JsonResponse({"error": error}, status=404)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class CategoryDeleteView(DeleteView):
+    model = Category
+    success_url = '/'
+
+    def delete(self, request, *args, **kwargs):
+        super().delete(request, *args, **kwargs)
+        return JsonResponse({"status": "ok"}, status=200)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class AdDeleteView(DeleteView):
+    model = Ad
+    success_url = '/'
+
+    def delete(self, request, *args, **kwargs):
+        super().delete(request, *args, **kwargs)
+        return JsonResponse({"status": "ok"}, status=200)
