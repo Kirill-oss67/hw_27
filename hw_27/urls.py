@@ -16,9 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-import ads
-from ads import views
-from ads.views import CategoryView
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),

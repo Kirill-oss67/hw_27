@@ -33,13 +33,13 @@ GET http://127.0.0.1:8000/ad/4
 Accept: application/json
 
 ###
-GET http://127.0.0.1:8000/cat/9
+GET http://127.0.0.1:8000/cat/2
 Accept: application/json
 
 ###
-DELETE http://127.0.0.1:8000/cat/9
+DELETE http://127.0.0.1:8000/cat/2
 Accept: application/json
 
 ###
-DELETE http://127.0.0.1:8000/ad/9
+DELETE http://127.0.0.1:8000/ad/2
 Accept: application/json
