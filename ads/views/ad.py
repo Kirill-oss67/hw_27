@@ -90,30 +90,33 @@ class AdCreateView(CreateView):
 @method_decorator(csrf_exempt, name='dispatch')
 class AdUpdateView(UpdateView):
     model = Ad
-    fields = ('name', 'author', 'price', 'description', 'is_published', 'category')
+    fields = ['name', 'price', 'description', 'is_published', 'image', 'category']
 
     def patch(self, request, *args, **kwargs):
         super().post(request, *args, **kwargs)
-        data = json.loads(request.body)
-        self.object.name = data["name"]
-        self.object.price = data["price"]
-        self.object.description = data["description"]
-        self.object.author = get_object_or_404(User, pk=data['author_id'])
-        self.object.category = get_object_or_404(Category, pk=data['author_id'])
+        ad_data = json.loads(request.body)
+
+        self.object.name = ad_data.get('name')
+        self.object.price = ad_data.get('price')
+        self.object.description = ad_data.get('description')
+        self.object.is_published = ad_data.get('is_published')
+        self.object.category_id = ad_data.get('category_id')
+
         self.object.save()
 
-        return JsonResponse({
-            "id": self.object.id,
-            "name": self.object.name,
-            "author_id": self.object.author_id,
-            "author": self.object.author.username,
-            "price": self.object.price,
-            "description": self.object.description,
-            "is_published": self.object.is_published,
-            "category_id": self.object.category_id,
-            "image": self.object.image.url if self.object.image else None
-        })
+        response = {
+            'id': self.object.id,
+            'author_id': self.object.author_id,
+            'author': str(self.object.author),
+            'name': self.object.name,
+            'price': self.object.price,
+            'description': self.object.description,
+            'is_published': self.object.is_published,
+            'image': self.object.image.url if self.object.image else None,
+            'category_id': self.object.category_id,
+        }
 
+        return JsonResponse(response, safe=False, json_dumps_params={"ensure_ascii": False, "indent": 4})
 
 @method_decorator(csrf_exempt, name='dispatch')
 class AdDeleteView(DeleteView):

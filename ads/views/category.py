@@ -30,18 +30,26 @@ class CategoryCreateView(CreateView):
         return JsonResponse({"id": new_category.id, "name": new_category.name}, safe=False,
                             json_dumps_params={"ensure_ascii": False})
 
+
 @method_decorator(csrf_exempt, name='dispatch')
 class CategoryUpdateView(UpdateView):
-    models = Category
+    model = Category
     fields = ['name']
 
     def patch(self, request, *args, **kwargs):
         super().post(request, *args, **kwargs)
         data = json.loads(request.body)
-        self.object.name = data['name']
+
+        self.object.name = data.get('name')
+
         self.object.save()
-        return JsonResponse({"id": self.object.id, "name": self.object.name}, safe=False,
-                            json_dumps_params={"ensure_ascii": False})
+
+        response = {
+            'id': self.object.id,
+            'name': self.object.name,
+        }
+
+        return JsonResponse(response, safe=False, json_dumps_params={"ensure_ascii": False, "indent": 4})
 
 
 class CategoryDetailView(DetailView):
