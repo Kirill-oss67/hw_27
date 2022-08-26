@@ -33,7 +33,7 @@ class UserListView(ListView):
                 "username": user.username,
                 "role": user.role,
                 "age": user.age,
-                # "locations": list(map(str, user.locations.all())),
+                "locations": list(map(str, user.locations.all())),
                 "total_ads": user.total_ads
             })
 
@@ -63,7 +63,7 @@ class UserDetailView(DetailView):
 @method_decorator(csrf_exempt, name='dispatch')
 class UserCreateView(CreateView):
     model = User
-    fields = ('first_name', 'last_name', 'username', 'password', 'role', 'age', 'location')
+    fields = ('first_name', 'last_name', 'username', 'password', 'role', 'age', 'locations')
 
     def post(self, request, *args, **kwargs):
         data = json.loads(request.body)
@@ -73,8 +73,11 @@ class UserCreateView(CreateView):
                                        password=data['password'],
                                        role=data['role'],
                                        age=data['age'])
-        location, _ = Location.objects.get_or_create(name=data.get['location'])
-        new_user.location = location
+
+        for location_name in data['locations']:
+            location, created = Location.objects.get_or_create(name=location_name)
+            new_user.locations.add(location)
+        new_user.save()
 
         return JsonResponse({
             "id": new_user.id,
@@ -83,28 +86,27 @@ class UserCreateView(CreateView):
             "username": new_user.username,
             "role": new_user.role,
             "age": new_user.age,
-            'location_id': new_user.location_id,
-            'location': str(new_user.location),
-            "total_ads": new_user.total_ads
+            'locations': list(map(str, new_user.locations.all()))
         })
 
 
 @method_decorator(csrf_exempt, name='dispatch')
 class UserUpdateView(UpdateView):
     model = User
-    fields = ('first_name', 'last_name', 'username', 'password', 'role', 'age', 'location')
+    fields = ('first_name', 'last_name', 'username', 'password', 'role', 'age', 'locations')
 
     def patch(self, request, *args, **kwargs):
         super().post(request, *args, **kwargs)
         data = json.loads(request.body)
-        location, _ = Location.objects.get_or_create(name=data.get['location'])
         self.object.first_name = data["first_name"]
         self.object.last_name = data["last_name"]
         self.object.username = data["username"]
         self.object.role = data['role']
         self.object.age = data['age']
-        self.object.location = location
-
+        for location_name in data['locations']:
+            location, created = Location.objects.get_or_create(name=location_name)
+            self.object.locations.add(location)
+        self.object.save()
         return JsonResponse({
             "id": self.object.id,
             "first_name": self.object.first_name,
@@ -112,8 +114,7 @@ class UserUpdateView(UpdateView):
             "username": self.object.username,
             "role": self.object.role,
             "age": self.object.age,
-            # "locations": list(map(str, self.object.locations.all())),
-            "total_ads": self.object.total_ads
+            "locations": list(map(str, self.object.locations.all()))
         })
 
 
