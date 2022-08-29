@@ -8,8 +8,10 @@ from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from rest_framework.generics import CreateAPIView
 
 from ads.models import User, Location
+from ads.serializers import UserCreateSerializers
 
 
 class UserListView(ListView):
@@ -56,73 +58,47 @@ class UserDetailView(DetailView):
             "username": user.username,
             "role": user.role,
             "age": user.age,
-            # "locations": list(map(str, user.locations.all())),
+            "locations": list(map(str, user.locations.all())),
         })
 
 
-@method_decorator(csrf_exempt, name='dispatch')
-class UserCreateView(CreateView):
-    model = User
-    fields = ('first_name', 'last_name', 'username', 'password', 'role', 'age', 'locations')
+class UserCreateView(CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserCreateSerializers
 
-    def post(self, request, *args, **kwargs):
-        data = json.loads(request.body)
-        new_user = User.objects.create(first_name=data['first_name'],
-                                       last_name=data['last_name'],
-                                       username=data['username'],
-                                       password=data['password'],
-                                       role=data['role'],
-                                       age=data['age'])
-
-        for location_name in data['locations']:
-            location, created = Location.objects.get_or_create(name=location_name)
-            new_user.locations.add(location)
-        new_user.save()
-
-        return JsonResponse({
-            "id": new_user.id,
-            "first_name": new_user.first_name,
-            "last_name": new_user.last_name,
-            "username": new_user.username,
-            "role": new_user.role,
-            "age": new_user.age,
-            'locations': list(map(str, new_user.locations.all()))
-        })
-
-
-@method_decorator(csrf_exempt, name='dispatch')
-class UserUpdateView(UpdateView):
-    model = User
-    fields = ('first_name', 'last_name', 'username', 'password', 'role', 'age', 'locations')
-
-    def patch(self, request, *args, **kwargs):
-        super().post(request, *args, **kwargs)
-        data = json.loads(request.body)
-        self.object.first_name = data["first_name"]
-        self.object.last_name = data["last_name"]
-        self.object.username = data["username"]
-        self.object.role = data['role']
-        self.object.age = data['age']
-        for location_name in data['locations']:
-            location, created = Location.objects.get_or_create(name=location_name)
-            self.object.locations.add(location)
-        self.object.save()
-        return JsonResponse({
-            "id": self.object.id,
-            "first_name": self.object.first_name,
-            "last_name": self.object.last_name,
-            "username": self.object.username,
-            "role": self.object.role,
-            "age": self.object.age,
-            "locations": list(map(str, self.object.locations.all()))
-        })
-
-
-@method_decorator(csrf_exempt, name='dispatch')
-class UserDeleteView(DeleteView):
-    model = User
-    success_url = '/'
-
-    def delete(self, request, *args, **kwargs):
-        super().delete(request, *args, **kwargs)
-        return JsonResponse({"status": "ok"}, status=200)
+# @method_decorator(csrf_exempt, name='dispatch')
+# class UserUpdateView(UpdateView):
+#     model = User
+#     fields = ('first_name', 'last_name', 'username', 'password', 'role', 'age', 'locations')
+#
+#     def patch(self, request, *args, **kwargs):
+#         super().post(request, *args, **kwargs)
+#         data = json.loads(request.body)
+#         self.object.first_name = data["first_name"]
+#         self.object.last_name = data["last_name"]
+#         self.object.username = data["username"]
+#         self.object.role = data['role']
+#         self.object.age = data['age']
+#         for location_name in data['locations']:
+#             location, created = Location.objects.get_or_create(name=location_name)
+#             self.object.locations.add(location)
+#         self.object.save()
+#         return JsonResponse({
+#             "id": self.object.id,
+#             "first_name": self.object.first_name,
+#             "last_name": self.object.last_name,
+#             "username": self.object.username,
+#             "role": self.object.role,
+#             "age": self.object.age,
+#             "locations": list(map(str, self.object.locations.all()))
+#         })
+#
+#
+# @method_decorator(csrf_exempt, name='dispatch')
+# class UserDeleteView(DeleteView):
+#     model = User
+#     success_url = '/'
+#
+#     def delete(self, request, *args, **kwargs):
+#         super().delete(request, *args, **kwargs)
+#         return JsonResponse({"status": "ok"}, status=200)

@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.conf.urls.static import static
-from django.urls import path
+from django.urls import path, include
 
 from ads.views.service import my_func
 from ads.views import ad as ad_view
@@ -8,6 +8,7 @@ from ads.views import category as category_view
 from ads.views import users as user_view
 
 urlpatterns = [
+    path('api-auth/', include('rest_framework.urls')),
     path('', my_func),
     path('cat/', category_view.CategoryListView.as_view()),
     path('cat/create/', category_view.CategoryCreateView.as_view()),
@@ -26,8 +27,8 @@ urlpatterns = [
     path('user/', user_view.UserListView.as_view()),
     path('user/create/', user_view.UserCreateView.as_view()),
     path('user/<int:pk>/', user_view.UserDetailView.as_view()),
-    path('user/<int:pk>/update/', user_view.UserUpdateView.as_view()),
-    path('user/<int:pk>/delete/', user_view.UserDeleteView.as_view())
+    # path('user/<int:pk>/update/', user_view.UserUpdateView.as_view()),
+    # path('user/<int:pk>/delete/', user_view.UserDeleteView.as_view())
 ]
 
 if settings.DEBUG:
