@@ -1,11 +1,16 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, include
+from rest_framework import routers
 
 from ads.views.service import my_func
 from ads.views import ad as ad_view
 from ads.views import category as category_view
 from ads.views import users as user_view
+from ads.views import locations as location_view
+
+router = routers.SimpleRouter()
+router.register('locations', location_view.LocationViewSet)
 
 urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
@@ -27,9 +32,10 @@ urlpatterns = [
     path('user/', user_view.UserListView.as_view()),
     path('user/create/', user_view.UserCreateView.as_view()),
     path('user/<int:pk>/', user_view.UserDetailView.as_view()),
-    # path('user/<int:pk>/update/', user_view.UserUpdateView.as_view()),
-    # path('user/<int:pk>/delete/', user_view.UserDeleteView.as_view())
-]
+    path('user/<int:pk>/update/', user_view.UserUpdateView.as_view()),
+    path('user/<int:pk>/delete/', user_view.UserDeleteView.as_view())
 
+]
+urlpatterns += router.urls
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
