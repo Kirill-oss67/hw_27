@@ -10,6 +10,7 @@ class UserCreateSerializers(serializers.ModelSerializer):
         many=True,
         slug_field='name'
     )
+
     def is_valid(self, raise_exception=False):
         self._locations = self.initial_data.pop('locations')
         return super().is_valid(raise_exception=raise_exception)
