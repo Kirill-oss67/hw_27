@@ -3,10 +3,12 @@ import json
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
+from django.views import View
 
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView, DeleteView, CreateView, UpdateView
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
+from rest_framework.permissions import IsAuthenticated
 
 from ads.models import Ad, User, Category
 
@@ -16,7 +18,7 @@ from ads.serializers import AdSerializer
 class AdListView(ListAPIView):
     queryset = Ad.objects.all()
     serializer_class = AdSerializer
-
+    permission_classes = [IsAuthenticated]
     def get(self, request, *args, **kwargs):
         categories = request.GET.getlist('cat', [])
         if categories:
@@ -36,22 +38,11 @@ class AdListView(ListAPIView):
         return super().get(request, *args, **kwargs)
 
 
-class AdDetailView(DetailView):
-    model = Ad
+class AdDetailView(RetrieveAPIView):
+    queryset = Ad.objects.all()
+    serializer_class = AdSerializer
+    permission_classes = [IsAuthenticated]
 
-    def get(self, request, *args, **kwargs):
-        ad = self.get_object()
-        return JsonResponse({
-            "id": ad.id,
-            "name": ad.name,
-            "author_id": ad.author_id,
-            "author": ad.author.username,
-            "price": ad.price,
-            "description": ad.description,
-            "is_published": ad.is_published,
-            "category_id": ad.category_id,
-            "image": ad.image.url if ad.image else None
-        })
 
 
 @method_decorator(csrf_exempt, name='dispatch')
