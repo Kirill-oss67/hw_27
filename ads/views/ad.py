@@ -3,14 +3,14 @@ import json
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
-from django.views import View
 
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import DetailView, DeleteView, CreateView, UpdateView
-from rest_framework.generics import ListAPIView, RetrieveAPIView
+from django.views.generic import DeleteView, CreateView, UpdateView
+from rest_framework.generics import ListAPIView, RetrieveAPIView, UpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 
 from ads.models import Ad, User, Category
+from ads.permissions import AdUpdateDeletePermission
 
 from ads.serializers import AdSerializer
 
@@ -69,36 +69,11 @@ class AdCreateView(CreateView):
         })
 
 
-@method_decorator(csrf_exempt, name='dispatch')
-class AdUpdateView(UpdateView):
-    model = Ad
-    fields = ['name', 'price', 'description', 'is_published', 'image', 'category']
 
-    def patch(self, request, *args, **kwargs):
-        super().post(request, *args, **kwargs)
-        ad_data = json.loads(request.body)
-
-        self.object.name = ad_data.get('name')
-        self.object.price = ad_data.get('price')
-        self.object.description = ad_data.get('description')
-        self.object.is_published = ad_data.get('is_published')
-        self.object.category_id = ad_data.get('category_id')
-
-        self.object.save()
-
-        response = {
-            'id': self.object.id,
-            'author_id': self.object.author_id,
-            'author': str(self.object.author),
-            'name': self.object.name,
-            'price': self.object.price,
-            'description': self.object.description,
-            'is_published': self.object.is_published,
-            'image': self.object.image.url if self.object.image else None,
-            'category_id': self.object.category_id,
-        }
-
-        return JsonResponse(response, safe=False, json_dumps_params={"ensure_ascii": False, "indent": 4})
+class AdUpdateView(UpdateAPIView):
+    queryset = Ad.objects.all()
+    permission_classes = [IsAuthenticated, AdUpdateDeletePermission]
+    serializer_class = AdSerializer
 
 
 @method_decorator(csrf_exempt, name='dispatch')
