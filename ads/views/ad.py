@@ -18,7 +18,6 @@ from ads.serializers import AdSerializer
 class AdListView(ListAPIView):
     queryset = Ad.objects.all()
     serializer_class = AdSerializer
-    permission_classes = [IsAuthenticated]
     def get(self, request, *args, **kwargs):
         categories = request.GET.getlist('cat', [])
         if categories:

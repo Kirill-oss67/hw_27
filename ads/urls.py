@@ -9,6 +9,7 @@ from ads.views import ad as ad_view
 from ads.views import category as category_view
 from ads.views import users as user_view
 from ads.views import locations as location_view
+from ads.views import selection as selection_view
 
 router = routers.SimpleRouter()
 router.register('locations', location_view.LocationViewSet)
@@ -36,7 +37,14 @@ urlpatterns = [
     path('user/<int:pk>/delete/', user_view.UserDeleteView.as_view()),
 
     path('user/token/', TokenObtainPairView.as_view()),
-    path('user/token/refresh/', TokenRefreshView.as_view())
+    path('user/token/refresh/', TokenRefreshView.as_view()),
+
+    path('selection/', selection_view.SelectionListView.as_view()),
+    path('selection/<int:pk>/', selection_view.SelectionDetailView.as_view()),
+    path('selection/create/', selection_view.SelectionCreateView.as_view()),
+    path('selection/<int:pk>/update/', selection_view.SelectionUpdateView.as_view()),
+
+
 
 ]
 urlpatterns += router.urls
