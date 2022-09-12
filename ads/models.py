@@ -1,10 +1,14 @@
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MinValueValidator
 from django.db import models
+
+from ads.validators import check_birthday, check_email
 
 
 class Category(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=100)
+    slug = models.CharField(max_length=10, default='category', validators=[MinValueValidator(5)])
 
     class Meta:
         verbose_name = "Категория"
@@ -26,9 +30,13 @@ class User(AbstractUser):
         ADMIN = 'admin', 'Администратор'
         MODERATOR = 'moderator', 'Модератор'
         MEMBER = 'member', 'Пользователь'
+
     role = models.CharField(max_length=9, choices=Role.choices, default=Role.MEMBER)
-    age = models.SmallIntegerField(null=True,blank=True)
+    age = models.SmallIntegerField(null=True, blank=True)
     locations = models.ManyToManyField(Location)
+    birth_date = models.DateField(validators=[check_birthday], null=True)
+    email = models.EmailField(unique=True, validators=[check_email])
+
     class Meta:
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"
@@ -36,10 +44,10 @@ class User(AbstractUser):
 
 
 class Ad(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, validators=[MinValueValidator(10)])
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     price = models.PositiveIntegerField()
-    description = models.TextField(null=True)
+    description = models.TextField(null=True, blank=True)
     is_published = models.BooleanField()
     image = models.ImageField(upload_to='ads/', null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
@@ -48,10 +56,12 @@ class Ad(models.Model):
         verbose_name = "Вакансия"
         verbose_name_plural = "Вакансии"
 
+
 class Selection(models.Model):
     name = models.CharField(max_length=100)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     items = models.ManyToManyField(Ad)
+
     class Meta:
         verbose_name = "Подборка"
         verbose_name_plural = "Подборки"

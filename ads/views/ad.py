@@ -6,18 +6,19 @@ from django.utils.decorators import method_decorator
 
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DeleteView, CreateView, UpdateView
-from rest_framework.generics import ListAPIView, RetrieveAPIView, UpdateAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView, UpdateAPIView, CreateAPIView
 from rest_framework.permissions import IsAuthenticated
 
 from ads.models import Ad, User, Category
 from ads.permissions import AdUpdateDeletePermission
 
-from ads.serializers import AdSerializer
+from ads.serializers import AdSerializer, AdCreateSerializer
 
 
 class AdListView(ListAPIView):
     queryset = Ad.objects.all()
     serializer_class = AdSerializer
+
     def get(self, request, *args, **kwargs):
         categories = request.GET.getlist('cat', [])
         if categories:
@@ -43,7 +44,11 @@ class AdDetailView(RetrieveAPIView):
     permission_classes = [IsAuthenticated]
 
 
-
+# class AdCreateView(CreateAPIView):
+#     queryset = Ad.objects.all()
+#     serializer_class = AdCreateSerializer
+#
+# #
 @method_decorator(csrf_exempt, name='dispatch')
 class AdCreateView(CreateView):
     model = Ad
@@ -51,6 +56,10 @@ class AdCreateView(CreateView):
 
     def post(self, request, *args, **kwargs):
         data = json.loads(request.body)
+
+        if data["is_published"] is True:
+            return JsonResponse({"error": "bad status"}, status=400)
+
         new_ad = Ad.objects.create(name=data['name'], author=get_object_or_404(User, pk=data['author_id']),
                                    price=data['price'],
                                    description=data['description'],
@@ -67,7 +76,6 @@ class AdCreateView(CreateView):
             "category_id": new_ad.category_id,
             "image": new_ad.image.url if new_ad.image else None
         })
-
 
 
 class AdUpdateView(UpdateAPIView):

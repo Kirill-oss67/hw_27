@@ -94,6 +94,10 @@ class AdSerializer(serializers.ModelSerializer):
         model = Ad
         fields = "__all__"
 
+class AdCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ad
+        fields = ('name', 'author', 'price', 'description', 'is_published', 'category')
 
 class SelectionListSerializer(serializers.ModelSerializer):
     class Meta:
