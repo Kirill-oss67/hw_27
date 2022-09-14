@@ -24,5 +24,5 @@ def test_ad_create(client, user, category):
     }
     response = client.post('/ad/create/', data, content_type="application/json")
     assert response.status_code == 200
-    # assert response.data == expected_data
+    assert response.data == expected_data
 
