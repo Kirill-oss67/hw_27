@@ -1,5 +1,5 @@
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import MinValueValidator
+from django.core.validators import MinLengthValidator
 from django.db import models
 
 from ads.validators import check_birthday, check_email
@@ -8,7 +8,7 @@ from ads.validators import check_birthday, check_email
 class Category(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=100)
-    slug = models.CharField(max_length=10, default='category', validators=[MinValueValidator(5)])
+    slug = models.CharField(max_length=10, unique=True, validators=[MinLengthValidator(5)])
 
     class Meta:
         verbose_name = "Категория"
@@ -33,9 +33,11 @@ class User(AbstractUser):
 
     role = models.CharField(max_length=9, choices=Role.choices, default=Role.MEMBER)
     age = models.SmallIntegerField(null=True, blank=True)
-    locations = models.ManyToManyField(Location)
+    locations = models.ManyToManyField(Location, default="")
     birth_date = models.DateField(validators=[check_birthday], null=True)
     email = models.EmailField(unique=True, validators=[check_email])
+    date_joined = models.DateField(null=True, blank=True)
+    last_name = models.CharField(max_length=100, default='default_name')
 
     class Meta:
         verbose_name = "Пользователь"
@@ -44,11 +46,11 @@ class User(AbstractUser):
 
 
 class Ad(models.Model):
-    name = models.CharField(max_length=50, validators=[MinValueValidator(10)])
+    name = models.CharField(max_length=50, validators=[MinLengthValidator(10)])
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     price = models.PositiveIntegerField()
     description = models.TextField(null=True, blank=True)
-    is_published = models.BooleanField()
+    is_published = models.BooleanField(default=False)
     image = models.ImageField(upload_to='ads/', null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
 

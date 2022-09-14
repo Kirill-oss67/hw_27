@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.generics import get_object_or_404
 
 from ads.models import Location, User, Ad, Category, Selection
 
@@ -26,7 +27,10 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ['username',
+                  'password',
+                  'birth_date',
+                  'locations']
 
 
 class UserListSerializer(serializers.ModelSerializer):
@@ -94,10 +98,33 @@ class AdSerializer(serializers.ModelSerializer):
         model = Ad
         fields = "__all__"
 
+
 class AdCreateSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        required=False,
+        queryset=Ad.objects.all(),
+        slug_field='username')
+    category = serializers.SlugRelatedField(
+        required=False,
+        queryset=Category.objects.all(),
+        slug_field='name')
+
+    def is_valid(self, raise_exception=False):
+        self._author_id = self.initial_data.pop('author_id')
+        self._category_id = self.initial_data.pop('category_id')
+        return super().is_valid(raise_exception=raise_exception)
+
+    def create(self, validated_data):
+        ad = Ad.objects.create(**validated_data)
+        ad.author_id = get_object_or_404(User, pk=self._author_id)
+        ad.category_id = get_object_or_404(User, pk=self._category_id)
+        ad.save()
+        return ad
+
     class Meta:
         model = Ad
-        fields = ('name', 'author', 'price', 'description', 'is_published', 'category')
+        fields = '__all__'
+
 
 class SelectionListSerializer(serializers.ModelSerializer):
     class Meta:
@@ -117,3 +144,9 @@ class SelectionSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = Selection
+
+
+class CategoryCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = "__all__"
+        model = Category
